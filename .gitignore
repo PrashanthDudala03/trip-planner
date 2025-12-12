@@ -1,0 +1,17 @@
+﻿__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+db.sqlite3
+media/
+staticfiles/
+node_modules/
+build/
+.DS_Store
+*.log
+*_BACKUP_*/
+*_BACKUP_*/
