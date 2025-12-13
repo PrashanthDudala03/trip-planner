@@ -10,13 +10,13 @@ function Home() {
       icon: <FaPlane />, 
       title: 'Plan Trips', 
       description: 'Organize your travels with ease',
-      action: () => navigate('/create')
+      action: () => navigate('/trips')
     },
     { 
       icon: <FaCalendar />, 
       title: 'Create Itineraries', 
       description: 'Schedule activities and events',
-      action: () => navigate('/trips')
+      action: () => navigate('/create')
     },
     { 
       icon: <FaDollarSign />, 
@@ -54,9 +54,15 @@ function Home() {
               key={index} 
               className="stat-card" 
               onClick={feature.action}
-              style={{cursor: 'pointer', transition: 'transform 0.3s'}}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              style={{cursor: 'pointer', transition: 'all 0.3s'}}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+              }}
             >
               <div className="stat-icon primary">{feature.icon}</div>
               <div className="stat-content">

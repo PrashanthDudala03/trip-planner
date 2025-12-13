@@ -1,6 +1,6 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaMapMarkerAlt, FaCalendar, FaDollarSign, FaListAlt, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaCalendar, FaDollarSign, FaListAlt, FaSearch } from 'react-icons/fa';
 import { tripAPI } from '../services/api';
 import { toast } from 'react-toastify';
 
@@ -12,10 +12,11 @@ function TripList() {
 
   useEffect(() => {
     fetchTrips();
-  }, []);
+  }, []); // This runs on mount and when we navigate to this page
 
   const fetchTrips = async () => {
     try {
+      setLoading(true);
       const response = await tripAPI.getAll();
       setTrips(response.data.results || response.data);
       setLoading(false);
@@ -52,7 +53,7 @@ function TripList() {
         <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center'}}>
           <div style={{flex: 1, minWidth: '250px'}}>
             <div style={{position: 'relative'}}>
-              <FaSearch style={{position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--gray)'}} />
+              <FaSearch style={{position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#6b7280'}} />
               <input
                 type="text"
                 placeholder="Search trips..."
@@ -61,7 +62,7 @@ function TripList() {
                 style={{
                   width: '100%',
                   padding: '0.9rem 1rem 0.9rem 2.5rem',
-                  border: '2px solid var(--border)',
+                  border: '2px solid #e5e7eb',
                   borderRadius: '10px',
                   fontSize: '1rem'
                 }}
@@ -99,9 +100,9 @@ function TripList() {
 
       {filteredTrips.length === 0 ? (
         <div className="card" style={{textAlign: 'center', padding: '4rem 2rem'}}>
-          <FaListAlt style={{fontSize: '4rem', color: 'var(--gray)', marginBottom: '1rem'}} />
+          <FaListAlt style={{fontSize: '4rem', color: '#6b7280', marginBottom: '1rem'}} />
           <h3>No trips found</h3>
-          <p style={{color: 'var(--gray)', marginBottom: '2rem'}}>
+          <p style={{color: '#6b7280', marginBottom: '2rem'}}>
             {search || filter !== 'all' ? 'Try adjusting your filters' : 'Start planning your first adventure!'}
           </p>
           {!search && filter === 'all' && (

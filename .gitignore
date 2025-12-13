@@ -1,17 +1,31 @@
-﻿__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
+﻿# Local scripts
+*.ps1
+
+# Experimental / unfinished backend apps
+backend/accounts/
+backend/travel/
+backend/api/
+
+# Python cache
+__pycache__/
+*.pyc
+# Environment files
 .env
-db.sqlite3
-media/
-staticfiles/
-node_modules/
-build/
-.DS_Store
-*.log
-*_BACKUP_*/
-*_BACKUP_*/
+backend/.env
+
+# Local database
+backend/db.sqlite3
+
+# Django static
+backend/staticfiles/
+
+# Backup folders
+backend_BACKUP_*/
+frontend_BACKUP_*/
+
+# Unfinished custom user work
+backend/users/models.py
+backend/users/migrations/
+backend/users/admin.py
+backend/users/apps.py
+backend/users/permissions.py
