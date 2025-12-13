@@ -1,10 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { FaPlane, FaHome, FaList, FaPlus, FaChartBar } from 'react-icons/fa';
 import Home from './pages/Home';
 import TripList from './pages/TripList';
 import TripDetail from './pages/TripDetail';
 import CreateTrip from './pages/CreateTrip';
+import EditTrip from './pages/EditTrip';
 import Dashboard from './pages/Dashboard';
 import './App.css';
 
@@ -48,6 +49,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/trips" element={<TripList />} />
           <Route path="/trips/:id" element={<TripDetail />} />
+          <Route path="/trips/:id/edit" element={<EditTrip />} />
           <Route path="/create" element={<CreateTrip />} />
         </Routes>
       </div>

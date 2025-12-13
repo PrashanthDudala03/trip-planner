@@ -1,4 +1,4 @@
-﻿from django.db import models
+from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 
@@ -29,10 +29,6 @@ class Trip(models.Model):
 
     class Meta:
         ordering = ['-created_at']
-        indexes = [
-            models.Index(fields=['start_date']),
-            models.Index(fields=['status']),
-        ]
 
     def __str__(self):
         return self.title
@@ -49,15 +45,15 @@ class Trip(models.Model):
 
 class Activity(models.Model):
     CATEGORY_CHOICES = [
-        ('sightseeing', '🏛️ Sightseeing'),
-        ('food', '🍽️ Food & Dining'),
-        ('adventure', '🏔️ Adventure'),
-        ('relaxation', '🧘 Relaxation'),
-        ('shopping', '🛍️ Shopping'),
-        ('entertainment', '🎭 Entertainment'),
-        ('transport', '🚗 Transport'),
-        ('accommodation', '🏨 Accommodation'),
-        ('other', '📌 Other'),
+        ('sightseeing', 'Sightseeing'),
+        ('food', 'Food & Dining'),
+        ('adventure', 'Adventure'),
+        ('relaxation', 'Relaxation'),
+        ('shopping', 'Shopping'),
+        ('entertainment', 'Entertainment'),
+        ('transport', 'Transport'),
+        ('accommodation', 'Accommodation'),
+        ('other', 'Other'),
     ]
     
     trip = models.ForeignKey(Trip, related_name='activities', on_delete=models.CASCADE)
@@ -77,7 +73,6 @@ class Activity(models.Model):
 
     class Meta:
         ordering = ['date', 'time']
-        verbose_name_plural = 'Activities'
 
     def __str__(self):
         return f"{self.name} - {self.trip.title}"

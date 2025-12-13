@@ -1,13 +1,35 @@
-﻿import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaPlane, FaCalendar, FaDollarSign, FaCheckCircle } from 'react-icons/fa';
 
 function Home() {
+  const navigate = useNavigate();
+
   const features = [
-    { icon: <FaPlane />, title: 'Plan Trips', description: 'Organize your travels with ease' },
-    { icon: <FaCalendar />, title: 'Create Itineraries', description: 'Schedule activities and events' },
-    { icon: <FaDollarSign />, title: 'Track Expenses', description: 'Monitor your travel budget' },
-    { icon: <FaCheckCircle />, title: 'Checklists', description: 'Never forget important items' },
+    { 
+      icon: <FaPlane />, 
+      title: 'Plan Trips', 
+      description: 'Organize your travels with ease',
+      action: () => navigate('/create')
+    },
+    { 
+      icon: <FaCalendar />, 
+      title: 'Create Itineraries', 
+      description: 'Schedule activities and events',
+      action: () => navigate('/trips')
+    },
+    { 
+      icon: <FaDollarSign />, 
+      title: 'Track Expenses', 
+      description: 'Monitor your travel budget',
+      action: () => navigate('/trips')
+    },
+    { 
+      icon: <FaCheckCircle />, 
+      title: 'Checklists', 
+      description: 'Never forget important items',
+      action: () => navigate('/trips')
+    },
   ];
 
   return (
@@ -28,7 +50,14 @@ function Home() {
       <div className="container">
         <div className="stats-grid">
           {features.map((feature, index) => (
-            <div key={index} className="stat-card">
+            <div 
+              key={index} 
+              className="stat-card" 
+              onClick={feature.action}
+              style={{cursor: 'pointer', transition: 'transform 0.3s'}}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
               <div className="stat-icon primary">{feature.icon}</div>
               <div className="stat-content">
                 <h3>{feature.title}</h3>
