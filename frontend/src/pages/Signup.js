@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaLock, FaPlane, FaEye, FaEyeSlash, FaEnvelope, FaPhone, FaUserTag } from 'react-icons/fa';
+import { useNavigate, Link } from 'react-router-dom';
+import { FaUser, FaEnvelope, FaLock, FaPhone, FaUserPlus, FaPlane } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import '../App.css';
+
+const API_URL = 'http://localhost:8000/api';
 
 function Signup() {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -15,53 +17,8 @@ function Signup() {
     last_name: '',
     phone: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (formData.password !== formData.password2) {
-      toast.error('Passwords do not match!');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await axios.post('http://localhost:8000/api/auth/register/', formData);
-      
-      // Store tokens and user info
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      toast.success(`Account created successfully! Welcome, ${response.data.user.username}! 🎉`);
-      navigate('/trips');
-    } catch (error) {
-      console.error('Signup error:', error);
-      if (error.response?.data) {
-        const errors = error.response.data;
-        Object.keys(errors).forEach(key => {
-          if (Array.isArray(errors[key])) {
-            errors[key].forEach(msg => toast.error(`${key}: ${msg}`));
-          } else {
-            toast.error(errors[key]);
-          }
-        });
-      } else {
-        toast.error('Signup failed. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -70,401 +27,179 @@ function Signup() {
     });
   };
 
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem'
-    }}>
-      <div style={{
-        width: '100%',
-        maxWidth: '550px',
-        background: 'white',
-        borderRadius: '20px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-        overflow: 'hidden'
-      }}>
-        {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          padding: '2.5rem 2rem',
-          textAlign: 'center',
-          color: 'white'
-        }}>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.password2) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post(API_URL + '/auth/register/', formData);
+      
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      toast.success('Account created successfully!');
+      
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
+      
+    } catch (error) {
+      console.error('Signup error:', error);
+      const errorMessage = error.response?.data?.username?.[0] || 
+                          error.response?.data?.email?.[0] || 
+                          'Registration failed. Please try again.';
+      toast.error(errorMessage);
+      setLoading(false);
+    }
+  };
+
+  return (<div className="auth-page"><div className="auth-container">
+      <div className="auth-card animate-fade-in">
+        <div className="auth-header">
           <div style={{
-            width: '70px',
-            height: '70px',
-            background: 'rgba(255,255,255,0.2)',
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 1rem',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 1rem',
-            backdropFilter: 'blur(10px)'
+            fontSize: '2.5rem',
+            color: 'white'
           }}>
-            <FaPlane style={{ fontSize: '2rem' }} />
+            <FaPlane />
           </div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: '800', marginBottom: '0.5rem' }}>
-            Create Account
-          </h1>
-          <p style={{ opacity: 0.9, fontSize: '0.95rem' }}>
-            Start your journey with us today
-          </p>
+          <h1>Create Account</h1>
+          <p>Start your journey with us today</p>
         </div>
 
-        {/* Form */}
-        <div style={{ padding: '2rem', maxHeight: '70vh', overflowY: 'auto' }}>
-          <form onSubmit={handleSubmit}>
-            {/* Username */}
-            <div style={{ marginBottom: '1.2rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.4rem',
-                fontWeight: '600',
-                color: '#1f2937',
-                fontSize: '0.9rem'
-              }}>
-                Username *
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-grid">
+            <div className="form-group">
+              <label>
+                <FaUser /> Username *
               </label>
-              <div style={{ position: 'relative' }}>
-                <FaUser style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#9ca3af',
-                  fontSize: '0.9rem'
-                }} />
-                <input
-                  type="text"
-                  name="username"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  placeholder="Choose a username"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem 1rem 0.9rem 2.8rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+                placeholder="Choose a username"
+                autoComplete="username"
+              />
             </div>
 
-            {/* Email */}
-            <div style={{ marginBottom: '1.2rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.4rem',
-                fontWeight: '600',
-                color: '#1f2937',
-                fontSize: '0.9rem'
-              }}>
-                Email *
+            <div className="form-group">
+              <label>
+                <FaEnvelope /> Email *
               </label>
-              <div style={{ position: 'relative' }}>
-                <FaEnvelope style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#9ca3af',
-                  fontSize: '0.9rem'
-                }} />
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="your@email.com"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem 1rem 0.9rem 2.8rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="your@email.com"
+                autoComplete="email"
+              />
+            </div>
+          </div>
+
+          <div className="form-grid">
+            <div className="form-group">
+              <label>First Name</label>
+              <input
+                type="text"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                placeholder="John"
+              />
             </div>
 
-            {/* Name Fields */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.2rem' }}>
-              <div>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '0.4rem',
-                  fontWeight: '600',
-                  color: '#1f2937',
-                  fontSize: '0.9rem'
-                }}>
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  name="first_name"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  placeholder="John"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
-              <div>
-                <label style={{
-                  display: 'block',
-                  marginBottom: '0.4rem',
-                  fontWeight: '600',
-                  color: '#1f2937',
-                  fontSize: '0.9rem'
-                }}>
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  name="last_name"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  placeholder="Doe"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
+            <div className="form-group">
+              <label>Last Name</label>
+              <input
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                placeholder="Doe"
+              />
             </div>
+          </div>
 
-            {/* Phone */}
-            <div style={{ marginBottom: '1.2rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.4rem',
-                fontWeight: '600',
-                color: '#1f2937',
-                fontSize: '0.9rem'
-              }}>
-                Phone (Optional)
+          <div className="form-group">
+            <label>
+              <FaPhone /> Phone (Optional)
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="+1 (555) 000-0000"
+            />
+          </div>
+
+          <div className="form-grid">
+            <div className="form-group">
+              <label>
+                <FaLock /> Password *
               </label>
-              <div style={{ position: 'relative' }}>
-                <FaPhone style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#9ca3af',
-                  fontSize: '0.9rem'
-                }} />
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="+1 (555) 000-0000"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem 1rem 0.9rem 2.8rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-              </div>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="Min. 6 characters"
+                autoComplete="new-password"
+                minLength={6}
+              />
             </div>
 
-            {/* Password */}
-            <div style={{ marginBottom: '1.2rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.4rem',
-                fontWeight: '600',
-                color: '#1f2937',
-                fontSize: '0.9rem'
-              }}>
-                Password *
+            <div className="form-group">
+              <label>
+                <FaLock /> Confirm Password *
               </label>
-              <div style={{ position: 'relative' }}>
-                <FaLock style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#9ca3af',
-                  fontSize: '0.9rem'
-                }} />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Min 6 characters"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem 2.8rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: '1rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: '#9ca3af',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
+              <input
+                type="password"
+                name="password2"
+                value={formData.password2}
+                onChange={handleChange}
+                required
+                placeholder="Re-enter password"
+                autoComplete="new-password"
+                minLength={6}
+              />
             </div>
+          </div>
 
-            {/* Confirm Password */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.4rem',
-                fontWeight: '600',
-                color: '#1f2937',
-                fontSize: '0.9rem'
-              }}>
-                Confirm Password *
-              </label>
-              <div style={{ position: 'relative' }}>
-                <FaLock style={{
-                  position: 'absolute',
-                  left: '1rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: '#9ca3af',
-                  fontSize: '0.9rem'
-                }} />
-                <input
-                  type={showPassword2 ? 'text' : 'password'}
-                  name="password2"
-                  required
-                  value={formData.password2}
-                  onChange={handleChange}
-                  placeholder="Confirm your password"
-                  style={{
-                    width: '100%',
-                    padding: '0.9rem 2.8rem',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '10px',
-                    fontSize: '0.95rem',
-                    transition: 'all 0.3s',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword2(!showPassword2)}
-                  style={{
-                    position: 'absolute',
-                    right: '1rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: '#9ca3af',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  {showPassword2 ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+            {loading ? 'Creating Account...' : (
+              <>
+                <FaUserPlus /> Create Account
+              </>
+            )}
+          </button>
+        </form>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '100%',
-                padding: '1rem',
-                background: loading ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '1.05rem',
-                fontWeight: '700',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s',
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                marginBottom: '1.5rem'
-              }}
-              onMouseEnter={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
-            >
-              {loading ? 'Creating Account...' : 'Create Account'}
-            </button>
-
-            {/* Sign In Link */}
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#6b7280', fontSize: '0.95rem' }}>
-                Already have an account?{' '}
-                <Link to="/login" style={{
-                  color: '#667eea',
-                  textDecoration: 'none',
-                  fontWeight: '700'
-                }}>
-                  Sign In
-                </Link>
-              </p>
-            </div>
-          </form>
+        <div className="auth-footer">
+          <p>Already have an account? <Link to="/login">Sign In</Link></p>
         </div>
       </div>
-    </div>
-  );
+    </div></div>);
 }
 
 export default Signup;
+

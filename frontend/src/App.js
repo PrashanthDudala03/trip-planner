@@ -1,24 +1,29 @@
-import React from 'react';
+﻿import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { FaPlane, FaHome, FaList, FaPlus, FaChartBar, FaSignInAlt, FaUserPlus, FaSignOutAlt } from 'react-icons/fa';
+import { FaPlane, FaHome, FaList, FaPlus, FaChartBar, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaUserShield } from 'react-icons/fa';
+import { 
+  getUserData, 
+  GuestRoute, 
+  ProtectedRoute, 
+  AdminRoute, 
+  UserOnlyRoute, 
+  UserOrSuperAdminRoute 
+} from './utils/RouteGuards';
+
 import Home from './pages/Home';
 import TripList from './pages/TripList';
 import TripDetail from './pages/TripDetail';
 import CreateTrip from './pages/CreateTrip';
 import EditTrip from './pages/EditTrip';
-import Dashboard from './pages/Dashboard';
+import UserDashboard from './pages/UserDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import NotFound from './pages/NotFound';
 import './App.css';
 
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem('access_token');
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
-
 function App() {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
-  const isAuthenticated = !!localStorage.getItem('access_token');
+  const { isAuthenticated, user, isAnyAdmin, isSuperAdmin } = getUserData();
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -37,12 +42,48 @@ function App() {
               <span>Trip Planner</span>
             </Link>
             <ul className="nav-menu">
-              <li className="nav-item">
-                <Link to="/" className="nav-link">
-                  <FaHome /> Home
-                </Link>
-              </li>
-              {isAuthenticated ? (
+              {!isAuthenticated ? (
+                <>
+                  <li className="nav-item">
+                    <Link to="/" className="nav-link">
+                      <FaHome /> Home
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/login" className="nav-link">
+                      <FaSignInAlt /> Login
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/signup" className="nav-link nav-link-btn">
+                      <FaUserPlus /> Sign Up
+                    </Link>
+                  </li>
+                </>
+              ) : isAnyAdmin ? (
+                <>
+                  <li className="nav-item">
+                    <Link to="/admin" className="nav-link">
+                      <FaUserShield /> Admin Dashboard
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/trips" className="nav-link">
+                      <FaList /> All Trips
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <button onClick={handleLogout} className="nav-link" style={{background: 'none', border: 'none', cursor: 'pointer', color: 'white'}}>
+                      <FaSignOutAlt /> Logout
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <span className="nav-link" style={{cursor: 'default'}}>
+                      {isSuperAdmin ? '👑' : '🛡️'} {user.username}
+                    </span>
+                  </li>
+                </>
+              ) : (
                 <>
                   <li className="nav-item">
                     <Link to="/dashboard" className="nav-link">
@@ -64,25 +105,10 @@ function App() {
                       <FaSignOutAlt /> Logout
                     </button>
                   </li>
-                  {user && (
-                    <li className="nav-item">
-                      <span className="nav-link" style={{cursor: 'default'}}>
-                        {user.username}
-                      </span>
-                    </li>
-                  )}
-                </>
-              ) : (
-                <>
                   <li className="nav-item">
-                    <Link to="/login" className="nav-link">
-                      <FaSignInAlt /> Login
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <Link to="/signup" className="nav-link nav-link-btn">
-                      <FaUserPlus /> Sign Up
-                    </Link>
+                    <span className="nav-link" style={{cursor: 'default'}}>
+                      {user.username}
+                    </span>
                   </li>
                 </>
               )}
@@ -91,14 +117,35 @@ function App() {
         </nav>
 
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          {/* Public Routes */}
+          <Route path="/" element={
+            isAuthenticated ? (
+              <Navigate to={isAnyAdmin ? '/admin' : '/dashboard'} replace />
+            ) : (
+              <Home />
+            )
+          } />
+          
+          {/* Guest Only Routes (redirect if logged in) */}
+          <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+          <Route path="/signup" element={<GuestRoute><Signup /></GuestRoute>} />
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+
+          {/* User Routes */}
+          <Route path="/dashboard" element={<UserOnlyRoute><UserDashboard /></UserOnlyRoute>} />
+          <Route path="/create" element={<UserOnlyRoute><CreateTrip /></UserOnlyRoute>} />
+
+          {/* Shared Routes (Different access levels) */}
           <Route path="/trips" element={<ProtectedRoute><TripList /></ProtectedRoute>} />
           <Route path="/trips/:id" element={<ProtectedRoute><TripDetail /></ProtectedRoute>} />
-          <Route path="/trips/:id/edit" element={<ProtectedRoute><EditTrip /></ProtectedRoute>} />
-          <Route path="/create" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
+          
+          {/* Edit only for Users and SuperAdmins */}
+          <Route path="/trips/:id/edit" element={<UserOrSuperAdminRoute><EditTrip /></UserOrSuperAdminRoute>} />
+
+          {/* 404 Page */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>
