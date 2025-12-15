@@ -105,7 +105,7 @@ function Login() {
           <p>Sign in to continue your journey</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} autoComplete="off" className="auth-form">
           <div className="form-group">
             <label>
               <FaUser /> Username
@@ -117,7 +117,7 @@ function Login() {
               onChange={handleChange}
               required
               placeholder="Enter your username"
-              autoComplete="username"
+              autoComplete="new-username"
             />
           </div>
 
@@ -132,7 +132,7 @@ function Login() {
               onChange={handleChange}
               required
               placeholder="Enter your password"
-              autoComplete="current-password"
+              autoComplete="new-password"
             />
           </div>
 

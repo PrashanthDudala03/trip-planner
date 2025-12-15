@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaSave, FaTimes } from 'react-icons/fa';
 import { tripAPI } from '../services/api';

@@ -81,7 +81,7 @@ function Signup() {
           <p>Start your journey with us today</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        <form onSubmit={handleSubmit} autoComplete="off" className="auth-form">
           <div className="form-grid">
             <div className="form-group">
               <label>

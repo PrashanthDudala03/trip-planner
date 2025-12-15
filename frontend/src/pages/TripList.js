@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaPlane, FaCalendar, FaMapMarkerAlt, FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import axios from 'axios';
@@ -73,7 +73,10 @@ function TripList() {
     <div className="container animate-fade-in">
       <div className="page-header">
         <div>
-          <h1>{isAnyAdmin ? '🌍 All Trips' : '✈️ My Trips'}</h1>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FaPlane />
+              {isAnyAdmin ? 'All Trips' : 'My Trips'}
+            </h1>
           <p>{isAnyAdmin ? 'Manage all user trips' : 'Your travel adventures'}</p>
         </div>
         {!isAnyAdmin && (
